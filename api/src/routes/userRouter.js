@@ -1,9 +1,9 @@
 const { Router } = require('express');
 
+const { registerUser } = require('../services/userService');
+
 const router = Router();
 
-router.get('/', (req, res) => {
-  res.send('hola');
-});
+router.get('/register', registerUser);
 
 module.exports = router;

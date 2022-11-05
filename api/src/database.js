@@ -19,4 +19,5 @@ Operation(db);
 
 module.exports = {
   db,
+  ...db.models,
 };

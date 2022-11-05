@@ -5,6 +5,7 @@ const morgan = require('morgan');
 const { db } = require('./src/database');
 const userRouter = require('./src/routes/userRouter');
 const operationRouter = require('./src/routes/operationRouter');
+const errorHandler = require('./src/middlewares/errorHandlerMiddleware');
 
 const app = express();
 
@@ -13,6 +14,7 @@ app.use(morgan('dev'));
 
 app.use('/user', userRouter);
 app.use('/operation', operationRouter);
+app.use(errorHandler);
 
 const PORT = 3001;
 
