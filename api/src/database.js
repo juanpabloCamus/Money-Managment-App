@@ -1,5 +1,6 @@
 const { Sequelize } = require('sequelize');
 const User = require('./models/User');
+const Operation = require('./models/Operation');
 
 const {
   DB_USER,
@@ -14,6 +15,7 @@ const db = new Sequelize(`postgres://${DB_USER}:${DB_PASSWORD}@${DB_HOST}:${DB_P
 });
 
 User(db);
+Operation(db);
 
 module.exports = {
   db,
