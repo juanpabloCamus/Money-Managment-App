@@ -1,9 +1,8 @@
 module.exports = ((error, req, res, next) => {
   console.log('---ERROR HANDLER---');
-  console.log(error.errors[0].type);
 
   const e = error.errors[0];
-  console.log(e);
+  console.log(error);
 
   if (e.type === 'Validation error') {
     //  TODO agregar validacion de password
