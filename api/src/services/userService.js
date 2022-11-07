@@ -29,12 +29,12 @@ const loginUser = async (req, res, next) => {
 
   try {
     const userExists = await user.findOne({ where: { email } });
-
-    const passwordCorrect = user === null
+    console.log(userExists);
+    const passwordCorrect = userExists === null
       ? false
       : await bcrypt.compare(password, userExists.dataValues.passwordHash);
 
-    if (!(user && passwordCorrect)) {
+    if (!(userExists && passwordCorrect)) {
       return res.status(401).json({
         error: 'Invalid user or password',
       });
