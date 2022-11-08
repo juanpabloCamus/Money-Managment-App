@@ -6,11 +6,14 @@ module.exports = (sequelize) => {
     {
       type: {
         type: DataTypes.ENUM('Entry', 'Withdraw'),
-        allowNull: false,
+        notNull: true,
       },
       amount: {
         type: DataTypes.FLOAT,
         allowNull: false,
+        validate: {
+          isNumeric: true,
+        },
       },
       concept: {
         type: DataTypes.STRING,

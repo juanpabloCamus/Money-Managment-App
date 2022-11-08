@@ -10,9 +10,14 @@ module.exports = (error, req, res, next) => {
       return res
         .status(400)
         .send({ error: 'Name must have 3 - 30 characters' });
+
     if (e.path === 'email')
       return res
         .status(400)
         .send({ error: 'Email must have this format (example@example.com)' });
+
+    if (e.path === 'amount')
+      return res.status(400).send({ error: 'The amount must be a number' });
   }
+  res.send('error');
 };
