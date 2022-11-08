@@ -29,7 +29,7 @@ const loginUser = async (req, res, next) => {
 
   try {
     const userExists = await user.findOne({ where: { email } });
-    console.log(userExists);
+
     const passwordCorrect = userExists === null
       ? false
       : await bcrypt.compare(password, userExists.dataValues.passwordHash);
