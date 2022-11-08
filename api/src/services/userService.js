@@ -8,7 +8,10 @@ const registerUser = async (req, res, next) => {
 
   try {
     const alreadyRegister = await user.findOne({ where: { email } });
-    if (alreadyRegister) return res.status(400).json({ error: 'This email is already registered!' });
+    if (alreadyRegister)
+      return res
+        .status(400)
+        .json({ error: 'This email is already registered!' });
 
     const passwordHash = await bcrypt.hash(password, 10);
 
@@ -30,9 +33,10 @@ const loginUser = async (req, res, next) => {
   try {
     const userExists = await user.findOne({ where: { email } });
 
-    const passwordCorrect = userExists === null
-      ? false
-      : await bcrypt.compare(password, userExists.dataValues.passwordHash);
+    const passwordCorrect =
+      userExists === null
+        ? false
+        : await bcrypt.compare(password, userExists.dataValues.passwordHash);
 
     if (!(userExists && passwordCorrect)) {
       return res.status(401).json({
@@ -43,12 +47,16 @@ const loginUser = async (req, res, next) => {
     const { name, id, money } = userExists.dataValues;
 
     const userForToken = {
-      id, name, email, money,
+      id,
+      name,
+      email,
+      money,
     };
     const token = jwt.sign(userForToken, process.env.JWT_SECRET);
 
     return res.status(200).send({
-      ...userForToken, token,
+      ...userForToken,
+      token,
     });
   } catch (error) {
     next(error);
