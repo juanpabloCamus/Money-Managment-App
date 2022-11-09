@@ -17,6 +17,7 @@ const postOperation = async (req, res, next) => {
   }
 
   let { money } = findUser.dataValues;
+
   try {
     const newOperation = await operation.create({
       type,
@@ -25,8 +26,9 @@ const postOperation = async (req, res, next) => {
       userId,
     });
 
-    if (type === 'Entry') money = parseInt(money, 10) + parseInt(amount, 10);
-    else money = parseInt(money, 10) - parseInt(amount, 10);
+    type === 'Entry'
+      ? (money = parseInt(money, 10) + parseInt(amount, 10))
+      : (money = parseInt(money, 10) - parseInt(amount, 10));
 
     user.update({ money }, { where: { id: userId } });
 
@@ -36,6 +38,28 @@ const postOperation = async (req, res, next) => {
   }
 };
 
+const getUserOperations = async (req, res, next) => {
+  const { userId, offset } = req.params;
+  const findUser = await user.findByPk(userId);
+
+  if (findUser === null) {
+    return res.status(404).send({ error: 'User not found' });
+  }
+
+  try {
+    const operations = await operation.findAndCountAll({
+      where: { userId },
+      limit: 10,
+      offset,
+    });
+
+    return res.status(200).send(operations);
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = {
   postOperation,
+  getUserOperations,
 };
