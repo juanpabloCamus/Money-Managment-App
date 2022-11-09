@@ -38,6 +38,48 @@ const postOperation = async (req, res, next) => {
   }
 };
 
+const putOperation = async (req, res, next) => {
+  const { opId } = req.params;
+  const { amount } = req.body;
+
+  try {
+    const {
+      dataValues: { amount: previousAmount },
+    } = await operation.findByPk(opId);
+
+    const updateOperation = await operation.update(
+      { amount },
+      { where: { id: opId } },
+    );
+
+    const findOpereation = await operation.findByPk(opId);
+    const { type } = findOpereation.dataValues;
+
+    const {
+      dataValues: { userId },
+    } = findOpereation;
+
+    const {
+      dataValues: { money: previousMoney },
+    } = await user.findByPk(userId);
+
+    const updateMoney =
+      type === 'Entry'
+        ? parseInt(previousMoney, 10) -
+          parseInt(previousAmount, 10) +
+          parseInt(amount, 10)
+        : parseInt(previousMoney, 10) +
+          parseInt(previousAmount, 10) -
+          parseInt(amount, 10);
+
+    user.update({ money: updateMoney }, { where: { id: userId } });
+
+    res.send(findOpereation);
+  } catch (error) {
+    next(error);
+  }
+};
+
 const getUserOperations = async (req, res, next) => {
   const { userId, offset } = req.params;
   const findUser = await user.findByPk(userId);
@@ -62,4 +104,5 @@ const getUserOperations = async (req, res, next) => {
 module.exports = {
   postOperation,
   getUserOperations,
+  putOperation,
 };
