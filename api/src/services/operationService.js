@@ -1,5 +1,26 @@
 const { user, operation } = require('../database');
 
+const getUserOperations = async (req, res, next) => {
+  const { userId, offset } = req.params;
+  const findUser = await user.findByPk(userId);
+
+  if (findUser === null) {
+    return res.status(404).send({ error: 'User not found' });
+  }
+
+  try {
+    const operations = await operation.findAndCountAll({
+      where: { userId },
+      limit: 10,
+      offset,
+    });
+
+    return res.status(200).send(operations);
+  } catch (error) {
+    next(error);
+  }
+};
+
 const postOperation = async (req, res, next) => {
   const { type, amount, concept } = req.body;
   const { userId } = req.params;
@@ -74,28 +95,34 @@ const putOperation = async (req, res, next) => {
 
     user.update({ money: updateMoney }, { where: { id: userId } });
 
-    res.send(findOpereation);
+    return res.status(200).send(findOpereation);
   } catch (error) {
     next(error);
   }
 };
 
-const getUserOperations = async (req, res, next) => {
-  const { userId, offset } = req.params;
-  const findUser = await user.findByPk(userId);
-
-  if (findUser === null) {
-    return res.status(404).send({ error: 'User not found' });
-  }
+const deleteOperation = async (req, res, next) => {
+  const { opId } = req.params;
 
   try {
-    const operations = await operation.findAndCountAll({
-      where: { userId },
-      limit: 10,
-      offset,
-    });
+    const {
+      dataValues: { amount, type, userId },
+    } = await operation.findByPk(opId);
 
-    return res.status(200).send(operations);
+    const {
+      dataValues: { money: previousMoney },
+    } = await user.findByPk(userId);
+
+    const updateMoney =
+      type === 'Entry'
+        ? parseInt(previousMoney, 10) - parseInt(amount, 10)
+        : parseInt(previousMoney, 10) + parseInt(amount, 10);
+
+    await user.update({ money: updateMoney }, { where: { id: userId } });
+
+    await operation.destroy({ where: { id: opId } });
+
+    res.status(200).send('Succesfully deleted');
   } catch (error) {
     next(error);
   }
@@ -105,4 +132,5 @@ module.exports = {
   postOperation,
   getUserOperations,
   putOperation,
+  deleteOperation,
 };
